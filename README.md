@@ -1,129 +1,59 @@
 # Student Management App
 
-This is a simple **Student Management** app built with **React** and **Material-UI** that allows users to add, edit, delete, and view students' details. The app includes features like form validation, reusable components, and multi-select functionality.
+A small CRUD app for managing student records, built with React 19, Material UI and MUI X DataGrid. Its forms use **React Hook Form** and **Yup**, with a set of reusable, controlled MUI form components.
 
 ## Features
 
-- **Add Student**: Fill in the student details like name, email, age, gender, course, skills, and interests.
-- **Edit Student**: Modify the details of existing students.
-- **Delete Student**: Remove a student from the list.
-- **Validation**: Forms are validated using **Yup** and **React Hook Form**.
-- **Reusable Components**: Custom form components for input fields, radio buttons, selects, checkboxes, etc.
-- **Responsive**: The app is fully responsive and works across all devices.
+- **Add, edit and delete students.** One form handles both create and edit. On edit it's pre-filled with the selected record.
+- **Student list in MUI X DataGrid** with edit and delete actions on each row.
+- **Schema validation with Yup:**
+  - name and email are required, and the email must be a valid address
+  - age must be a positive whole number
+  - gender and course are required
+  - at least one skill and at least one interest must be selected
+- **Reusable form controls.** `FormInput`, `FormRadio`, `FormSelect` (single or multiple choice) and `FormCheckbox` wrap MUI inputs in React Hook Form's `Controller`, so every field shows its own validation error.
+- **Constants-driven options.** Course, skill and interest options live in `src/constants/constants.js`.
 
-## Technologies Used
+## Tech stack
 
-- **React**: JavaScript library for building user interfaces.
-- **Material-UI**: A popular React component library to implement the UI.
-- **React Hook Form**: Library for managing form state and validation.
-- **Yup**: Schema validation library for handling form validation.
-- **MUI X DataGrid**: A highly customizable data grid component for rendering the student list.
-- **Styled Components (optional)**: For styling the components (if used).
+React 19 · Material UI 6 · MUI X DataGrid 7 · React Hook Form 7 · Yup · Create React App
 
-## Project Setup
-
-To get started with the project, follow these steps:
-
-### 1. Clone the repository
+## Getting started
 
 ```bash
-git clone https://github.com/hemant419/student-management-app.git
-```
-
-### 2. Install dependencies
-
-Navigate to the project directory and run:
-
-```bash
+git clone https://github.com/hemantpatil135/student-management-app.git
+cd student-management-app
 npm install
+npm start          # http://localhost:3000
 ```
 
-### 3. Run the application
+No environment variables are needed. Data lives in component state, so a page refresh clears it.
 
-Start the app locally:
-
-```bash
-npm start
-```
-
-This will open the app in your default browser at `http://localhost:3000`.
-
-## Folder Structure
+## Project structure
 
 ```
 src/
 ├── components/
 │   ├── FormComponents/
-│   │   ├── FormInput.js
-│   │   ├── FormRadio.js
-│   │   ├── FormSelect.js
-│   │   └── FormCheckbox.js
-│   ├── StudentForm.js
-│   ├── StudentTable.js
-├── constants/
-│   └── constants.js
-├── utils/
-│   └── validation.js
-├── App.js
-└── index.js
+│   │   ├── FormInput.js       # TextField + Controller
+│   │   ├── FormRadio.js       # RadioGroup (gender)
+│   │   ├── FormSelect.js      # Select, single or multiple
+│   │   └── FormCheckbox.js    # checkbox group (interests)
+│   ├── StudentForm.js         # add/edit form wired to the Yup schema
+│   └── StudentTable.js        # DataGrid list with row actions
+├── constants/constants.js     # course, skill and interest options
+├── utils/validation.js        # Yup schema
+└── App.js                     # list/form toggle and CRUD state
 ```
 
-- **`components/`**: Contains all the React components used for the form and table.
-  - `StudentForm.js`: The main form for adding and editing students.
-  - `StudentTable.js`: Displays the list of students.
-  - `FormInput.js`: A reusable input field component using Material-UI's `TextField`.
-  - `FormRadio.js`: A reusable radio button component for gender selection.
-  - `FormSelect.js`: A reusable select component, supporting both single and multi-selection.
-  - `FormCheckbox.js`: A reusable checkbox component for selecting interests.
-- **`constants/`**: Contains constants like list of courses, skills, and interests.
-  - `constants.js`: Contains predefined values used in the form.
-- **`utils/`**: Contains utility files like validation schema.
-  - `validation.js`: The validation schema using `Yup` for form fields.
+## How it works
 
-## Custom Components
+`App.js` owns the `students` array and decides whether the list or the form is showing. `StudentForm` runs `useForm` with `yupResolver(validationSchema)` and resets to the selected record when editing. Each field component receives `control` and `errors`, which keeps the form itself declarative.
 
-### **Form Components**:
+## Known limitations and next steps
 
-- **FormInput**: A reusable input field component using Material-UI's `TextField`.
-- **FormRadio**: A reusable radio button component for gender selection.
-- **FormSelect**: A reusable select component, supporting both single and multi-selection.
-- **FormCheckbox**: A reusable checkbox component for selecting interests.
-
-### **StudentTable**:
-
-- Displays the list of students in a table format.
-- Users can **edit** or **delete** a student using the provided actions.
-
-## Features and Functionality
-
-### **Add a Student**:
-
-- Clicking the "Add Student" button will display a form to add a new student.
-- The form includes fields such as name, email, age, gender, course, skills, and interests.
-- On form submission, the student is added to the student list.
-
-### **Edit a Student**:
-
-- Users can click on the "Edit" button next to a student in the list.
-- The form will pre-fill with the student's current data.
-- Users can modify the data and submit the changes.
-
-### **Delete a Student**:
-
-- Users can delete a student by clicking on the "Delete" button next to their name in the list.
-- The student will be removed from the list upon confirmation.
-
-### **Validation**:
-
-- All form fields are validated using `Yup` schema validation with `React Hook Form`.
-- The fields include `name`, `email`, `age`, `gender`, `course`, `skills`, and `interests`.
-
-### **Multi-Select**:
-
-- The "Skills" and "Interests" fields support multi-selection, allowing users to select multiple values at once.
-
-## Acknowledgements
-
-- **Material-UI**: For the UI components.
-- **React Hook Form**: For managing form state and validation.
-- **Yup**: For schema validation in forms.
+- New IDs come from `students.length + 1`, which can repeat after a delete. Switch to `crypto.randomUUID()`.
+- Delete happens immediately. Add a confirmation dialog.
+- Persist data (localStorage or a small API) so it survives a refresh
+- Add tests for the schema and the add/edit flow
+- Migrate to Vite and TypeScript
